@@ -1,0 +1,11 @@
+\babel@toc {polish}{}\relax 
+\contentsline {section}{\numberline {1}Cel}{1}{}%
+\contentsline {section}{\numberline {2}nMOS}{1}{}%
+\contentsline {subsection}{\numberline {2.1}Charakterystyka bramkowa nMOS}{1}{}%
+\contentsline {subsection}{\numberline {2.2}Charakterystyka drenowa nMOS}{2}{}%
+\contentsline {subsection}{\numberline {2.3}Tranzystor nMOS jako przełącznik}{6}{}%
+\contentsline {subsection}{\numberline {2.4}Czas załączania tranzystora nMOS}{7}{}%
+\contentsline {section}{\numberline {3}pMOS}{10}{}%
+\contentsline {subsection}{\numberline {3.1}Charakterystyka bramkowa pMOS}{10}{}%
+\contentsline {subsection}{\numberline {3.2}Charakterystyka drenowa pMOS}{12}{}%
+\contentsline {section}{\numberline {4}Wnioski}{14}{}%

@@ -1,0 +1,593 @@
+%% Wzóra sprawozdania w LateXu
+
+\documentclass[polish,polish,a4paper]{article}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{pslatex}
+\usepackage{wrapfig}
+\usepackage{pgfplots}
+\usepackage[europeanresistors]{circuitikz} 
+\usepackage{subcaption}
+\usepackage{anysize}
+\marginsize{2.5cm}{2.5cm}{3cm}{3cm}
+\bibliographystyle{IEEEtran}
+
+\newcommand{\PRzFieldDsc}[1]{\sffamily\bfseries\scriptsize #1}
+\newcommand{\PRzFieldCnt}[1]{\textit{#1}}
+\newcommand{\PRzHeading}[8]{
+%% #1 - nazwa laboratorium
+%% #2 - kierunek 
+%% #3 - specjalność 
+%% #4 - rok studiów 
+%% #5 - symbol grupy lab.
+%% #6 - temat 
+%% #7 - numer lab.
+%% #8 - skład grupy ćwiczeniowej
+
+\begin{center}
+\begin{tabular}{ p{0.32\textwidth} p{0.15\textwidth} p{0.15\textwidth} p{0.12\textwidth} p{0.12\textwidth} }
+
+  &   &   &   &   \\
+\hline
+\multicolumn{5}{|c|}{}\\[-1ex]
+\multicolumn{5}{|c|}{{\LARGE #1}}\\
+\multicolumn{5}{|c|}{}\\[-1ex]
+
+\hline
+\multicolumn{1}{|l|}{\PRzFieldDsc{Kierunek}}	& \multicolumn{1}{|l|}{\PRzFieldDsc{Specjalność}}	& \multicolumn{1}{|l|}{\PRzFieldDsc{Rok studiów}}	& \multicolumn{2}{|l|}{\PRzFieldDsc{Symbol grupy lab.}} \\
+\multicolumn{1}{|c|}{\PRzFieldCnt{#2}}		& \multicolumn{1}{|c|}{\PRzFieldCnt{#3}}		& \multicolumn{1}{|c|}{\PRzFieldCnt{#4}}		& \multicolumn{2}{|c|}{\PRzFieldCnt{#5}} \\
+
+\hline
+\multicolumn{4}{|l|}{\PRzFieldDsc{Temat Laboratorium}}		& \multicolumn{1}{|l|}{\PRzFieldDsc{Numer lab.}} \\
+\multicolumn{4}{|c|}{\PRzFieldCnt{#6}}				& \multicolumn{1}{|c|}{\PRzFieldCnt{#7}} \\
+
+\hline
+\multicolumn{5}{|l|}{\PRzFieldDsc{Skład grupy ćwiczeniowej oraz numery indeksów}}\\
+\multicolumn{5}{|c|}{\PRzFieldCnt{#8}}\\
+
+\hline
+\multicolumn{3}{|l|}{\PRzFieldDsc{Uwagi}}	& \multicolumn{2}{|l|}{\PRzFieldDsc{Ocena}} \\
+\multicolumn{3}{|c|}{\PRzFieldCnt{\ }}		& \multicolumn{2}{|c|}{\PRzFieldCnt{\ }} \\
+
+\hline
+\end{tabular}
+\end{center}
+}
+
+\begin{document}
+
+\PRzHeading{Laboratorium Elektroniki}{Informatyka}{--}{I}{L6}{Układy RLC}{6}{Maciej Kaszkowiak (151856), Dawid Jędraszczyk(148293), Michał Kalinowski(151758)}{}
+
+\section{Cel}
+Celem laboratorium jest zapoznanie się z zachowaniem elementów indukcyjnych, pojemnościowych oraz rezystancyjnych przy pobudzeniu prądem przemiennym. Ćwiczenia miały na celu również zapoznanie się z zachowaniem elementów pojemnościowych przy pobudzeniu prądem stałym. Badaliśmy zmiany skutecznej wartości prądu oraz napięcia w obwodzie w zależności od częstotliwości pobudzenia. 
+
+\section{Krzywa ładowania pojemności}
+
+W celu wyznaczeniu czasu ładowania pojemności zbudowaliśmy następujący obwód na płytce prototypowej:  
+\begin{figure}[H]
+\centering
+\begin{circuitikz}
+	\draw (0,0)
+	to[american voltage source, v=$10V$, invert] (0,4)
+	to[R=$1 M\Omega$] (4,4)
+	to[switch] (6,4)
+	to[C, a=$C$, l=$47 \mu F$] (6, 0) -- (0, 0)
+	(6,4) -- (8,4)
+	  to[rmeter, t=V] (8,0) -- (6,0);
+\end{circuitikz}
+\caption{Badany obwód do wyznaczania czasu ładowania pojemności.}
+\end{figure}
+Zmierzyliśmy wartości elementów wykorzystanych do zbudowania 
+układu, ich wartości rzeczywiste nieznacznie odbiegały od wartości nominalnych:
+\begin{gather}
+U = 10.2 V \\
+C = 47.22 \mu \\
+R = 987k\Omega
+\end{gather}
+Układ wykorzystuje przełącznik trzypozycyjny. Powyższy schemat przedstawia pozycję przełącznika w stanie załączenia ciągłego. W stanie wyłączenia \emph{off} prąd nie płynie przez układ. Przełącznik również posiada funkcję załączenia chwilowego, która powoduje rozładowanie kondensatora. Działanie można zaobserwować na poniższym schemacie:
+\begin{figure}[H]
+\centering
+\begin{circuitikz}
+	\draw (0,0)
+	to[R=$1 k\Omega$, invert] (0,4) -- (2,4)
+	to[switch] (4,4)
+	to[C, a=$C$, l=$47 \mu F$] (4, 0) -- (0, 0)
+	(4,4) -- (6,4)
+	  to[rmeter, t=V] (6,0) -- (4,0);
+\end{circuitikz}
+\caption{Układ w stanie załączenia chwilowego.}
+\end{figure}
+Energia zgromadzona w kondensatorze jest rozpraszana przez rezystor $1k\Omega$. Wykorzystany sposób rozładowania kondensatora wymaga dobrania rezystora o odpowiedniej mocy. \cite{kondensatorki}
+
+
+
+\subsection{Teoretyczne obliczenie prądu oraz napięć w układzie}
+
+W pierwszym kroku obliczyliśmy napięcie na kondensatorze w zależności od czasu:
+\begin{gather}
+u_C(t) = E(1 - e^{\frac{-t}{RC}})
+\end{gather}
+Następnie podstawiliśmy wartości ustalone drogą pomiarów:
+\begin{gather}
+u_C(t) = 10.2(1 - e^{\frac{-t}{0.987 \cdot 10^6 \cdot 47.22 \cdot 10^{-6}}}) \\
+u_C(t) = 10.2(1 - e^{\frac{-t}{46.606}})
+\end{gather}
+W drugim kroku obliczyliśmy natężenie prądu płynącego przez kondensator w zależności od czasu: \cite{openstax}
+\begin{gather}
+i_C(t) = C \cdot \frac{du_C(t)}{dt} \\
+\frac{du_C(T)}{dt} = E \cdot \frac{e^{\frac{-t}{CR}}}{CR} \\
+i_C(t) = E \cdot \frac{e^{\frac{-t}{CR}}}{R}
+\end{gather}
+Następnie podstawiliśmy wartości ustalone drogą pomiarów:
+\begin{gather}
+i_C(t) = 10.2 \cdot \frac{e^{\frac{-t}{46.606}}}{0.987 \cdot 10^6}
+\end{gather}
+
+\newpage
+\subsection{Wyniki pomiarów oraz obliczeń}
+Finalnie obliczyliśmy wartości napięcia oraz natężenia dla wartości czasu przyjętych przy pomiarach.
+Przebiegi czasowe procesu ładowania pojemności przedstawiają się następująco:
+\begin{figure}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{\begin{tabular}[c]{@{}c@{}}Czas ładowania\\ kondensatora\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Zmierzone napięcie \\ na kondensatorze\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Obliczone napięcie\\ na kondensatorze\end{tabular}}& \textbf{\begin{tabular}[c]{@{}c@{}}Obliczone napięcie\\ na rezystorze\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Obliczony prąd\\ płynący przez układ\end{tabular}} \\ \hline
+$10.09s$ & $1.984 V$ & $1.98556 V $ & $ 8.21 V$ & $8.322 \mu A$ \\ \hline
+$20.11s$ & $3.504 V$ & $3.57467 V $ & $ 6.63 V$ & $6.714 \mu A$ \\ \hline
+$30.05s$ & $4.67 V$ & $4.84718 V $ & $ 5.35 V$ & $5.423 \mu A$ \\ \hline
+$39.99s$ & $5.63 V$ & $5.87528 V $ & $ 4.32 V$ & $4.381 \mu A$ \\ \hline
+$49.95s$ & $6.39 V$ & $6.70742 V $ & $ 3.49 V$ & $3.542 \mu A$ \\ \hline
+$59.97s$ & $7.02 V$ & $7.38307 V $ & $ 2.82 V$ & $2.854 \mu A$ \\ \hline
+$69.93s$ & $7.50 V$ & $7.92508 V $ & $ 2.27 V$ & $2.306 \mu A$ \\ \hline
+$80.07s$ & $7.90 V$ & $8.36989 V $ & $ 1.83 V$ & $1.856 \mu A$ \\ \hline
+$89.94s$ & $8.20 V$ & $8.71917 V $ & $ 1.48 V$ & $1.530 \mu A$ \\ \hline
+$100.03s$ & $8.45 V$ & $9.00744 V $ & $ 1.19 V$ & $1.208 \mu A$ \\ \hline
+$110.11s$ & $8.65 V$ & $9.23938 V $ & $ 0.96 V$ & $0.975 \mu A$ \\ \hline
+$120.08s$ & $8.80 V$ & $9.42438 V $ & $ 0.78 V$ & $0.785 \mu A$ \\ \hline
+$130.03s$ & $8.92 V$ & $9.57348 V $ & $ 0.63 V$ & $0.635 \mu A$ \\ \hline
+$140.04s$ & $9.03 V$ & $9.69458 V $ & $ 0.51 V$ & $0.512 \mu A$ \\ \hline
+\end{tabular}
+\caption {Przebiegi czasowe procesu ładowania pojemności}
+\end{figure}
+
+Występuje drobna rozbieżność w granicach błędu pomiarowego pomiędzy zmierzonym a obliczonym napięciem.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    title={$u_{C}(t) = f(t)$ },
+    xlabel={Czas [s]},
+    ylabel={Napięcie [V]},
+    xmin=0, xmax=145,
+    ymin=0, ymax=10,
+    xtick={20,40,60,80,100,120,140},
+    ytick={1,2,3,4,5,6,7,8,9,10},
+    legend pos=south east,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    (0,0)(10,1.984)(20,3.504)(30,4.67)(40,5.63)(50,6.39)(60,7.02)(70,7.5)(80,7.9)(90,8.2)(100,8.45)(110,8.65)(120,8.8)(130,8.92)(140,9.03)
+    };
+\addlegendentry{Pomiary},
+    
+\addplot[
+    color=red,
+    mark=square,
+    ]
+    coordinates {
+    (0,0)(10,1.98556)(20,3.57467)(30,4.84718)(40,5.87528)(50,6.7)(60,7.383)(70,7.925)(80,8.36989)(90,8.71917)(100,9)(110,9.23938)(120,9.42438)(130,9.57348)(140,9.69458)
+    };
+\addlegendentry{Krzywa Teoretyczna},
+    
+\end{axis}
+\end{tikzpicture}
+\caption{Krzywa ładowania pojemności.}
+\end{figure}
+
+
+\section{Obwód RC zasilony prądem przemiennym}
+
+Zbudowaliśmy następujący obwód RC na płytce prototypowej:  
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}
+	\draw (0,0)
+	to[sinusoidal voltage source, v=$5V_{pp}$, invert] (0,4)
+	to[C, l=$C$, a=$10 nF$] (4,4)
+	to[R, a=$R$, l=$1k \Omega$] (4, 0) -- (0, 0);
+\end{circuitikz}
+\caption{Badany obwód RC.}
+\end{figure}
+
+\subsection{Pomiar napięć oraz przesunięcia fazowego}
+Z wykorzystaniem oscyloskopu uzyskaliśmy następujące pomiary:
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{\begin{tabular}[c]{@{}c@{}}Częstotliowść\\ pobudzenia\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na źródle\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na rezystancji\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Obliczone \\ napięcie skuteczne\\ na pojemności\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Przesunięcie fazowe\\ pomiędzy przebiegiem\\ wejściowym oraz\\ przebiegiem prądowym\end{tabular}} \\ \hline
+
+$1 kHz$ & $1.718 V$ & $98 mV$ & $1.715 V$ & $79,2 ^{\circ}$ \\ \hline
+$2 kHz$ & $1.775 V$ & $180 mV$ & $1.766 V$ & $89,28 ^{\circ}$ \\ \hline
+$4 kHz$ & $1.771 V$ & $361 mV$ & $1.734 V$ & $80,64 ^{\circ}$ \\ \hline
+$6.4 kHz$ & $1.768 V$ & $569 mV$ & $1.674 V$ & $73,7 ^{\circ} $ \\ \hline
+$8 kHz$ & $1.768 V$ & $686 mV$ & $1.629 V$ & $63,36 ^{\circ}$ \\ \hline
+$10 kHz$ & $1.725 V$ & $827 mV$ & $1.514 V$ & $57,6 ^{\circ}$ \\ \hline
+$12 kHz$ & $1.715 V$ & $933 mV$ & $1.439 V$ & $77,76 ^{\circ}$ \\ \hline
+$14 kHz$ & $1.718 V$ & $1047 mV$ & $1.362 V$ & $52,42 ^{\circ}$ \\ \hline
+$16 kHz$ & $1.754 V$ & $1124 mV$ & $1.346 V$ & $46.07 ^{\circ}$ \\ \hline
+$18 kHz$ & $1.686 V$ & $1209 mV$ & $1.175 V$ & $41.47 ^{\circ}$ \\ \hline
+$20 kHz$ & $1.739 V$ & $1273 mV$ & $1.185 V$ & $34.54 ^{\circ}$ \\ \hline
+
+
+\end{tabular}
+\caption{Pomiary napięć oraz przesunięcia fazowego w obwodzie RC.}
+\end{figure}
+
+\newpage
+\subsection{Obliczenie wartości teoretycznej napięć i prądu}
+
+Wykorzystaliśmy metodę liczb zespolonych do analitycznego wyznaczenia wartości napięć i prądu w obwodzie dla częstotliwości 1 kHz. 
+
+\begin{gather}
+U_{pp} = 5 V \\
+f = 1 kHz = 1 \cdot 10^3 Hz \\ 
+C = 10 nF = 1 \cdot 10^{-8} F \\
+R = 1k\Omega = 1 \cdot 10^3 \Omega
+\end{gather}
+
+W pierwszym kroku wyznaczyliśmy reaktancję kondensatora: 
+
+\begin{gather}
+X_c = \frac{1}{\omega C} = \frac{1}{2 \pi f C} \\
+X_c = \frac{1}{2 \pi \cdot 10^3 \cdot 10^{-8}} =  \frac{1}{2 \pi \cdot 10^{-5}} = 15915.49 \Omega
+\end{gather}
+
+W następnym kroku wyznaczyliśmy impendancję układu:
+
+\begin{gather}
+|Z| = \sqrt{R^2 + X_c^2} \\
+|Z| = \sqrt{10^6 + 15915.49^2} = 15946.87 \Omega
+\end{gather}
+
+
+Następnie wyznaczyliśmy zespoloną wartość skuteczną napięcia: \cite{elektronika}
+
+\begin{gather}
+|U| = \frac{U_{p}}{\sqrt{2}} = \frac{U_{pp}}{2\sqrt{2}} \\
+|U| = \frac{5}{2\sqrt{2}} = 1.767 V
+\end{gather}
+
+W dalszym ciągu ustaliliśmy wartości skuteczne prądu płynącego przez układ oraz napięcia na rezystorze i kondensatorze:
+
+\begin{gather}
+|I| = \frac{|U|}{|Z|} \\
+|I| = \frac{1.767}{15946.87} = 110.8 \mu A \\
+U_{rezystor} = |I| \cdot R = 110.8 mV
+\end{gather}
+
+Finalnie w celu wyznaczenia wartości skutecznej napięcia na kondensatorze skorzystaliśmy z napięciowego prawa Kirchoffa. \cite{mieczyslaw}
+\begin{gather}
+U_{kondensator} = \sqrt{U_{zrodlo}^2 - U_{rezystor}^2} \\
+U_{kondensator} = \sqrt{1.767^2 - 0.1108^2} = 1.7635 V
+\end{gather}
+
+\newpage
+Wyniki ustalone analitycznie przedstawiają się następująco:
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Prąd układu} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na rezystancji\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne \\ na kondensatorze\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na źródle\end{tabular}} \\ \hline
+$110.8 \mu A$           & $110.8 mV$                                                                           & $1.7635 V$                                                                              & $1.767 V$                                                                       \\ \hline
+\end{tabular}
+\caption{Wyniki ustalone analitycznie dla obwodu RC.}
+\end{figure}
+
+Występuje drobna rozbieżność w granicach błędu pomiarowego - zmierzyliśmy napięcie skuteczne na rezystancji jako $98 mV$, natomiast drogą obliczeń ustaliliśmy jego wartość jako $110.8 mV$. Rozbieżność może być spowodowana niedoskonałością poszczególnych komponentów oraz napięciem skutecznym zasilania odbiegającym od wartości $5V$.
+
+
+\subsection{Relacja pomiędzy reaktancją pojemnościową a częstotliwością pobudzenia oraz wartością prądu w obwodzie}
+
+W celu ustalenia relacji przeprowadziliśmy modyfikację postaci wzoru na reaktancję pojemnościową:
+\begin{gather}
+X_{C} = -j \frac{1}{\omega C} \\
+\omega = \frac{2\pi}{T} \\
+T = \frac{1}{f} \\
+X_{C} = -j \frac{1}{2\pi fC} \\
+C = \frac{Q}{U} \\ 
+U = RI \\
+X_{C} = -j\frac{1}{2\pi f\frac{Q}{RI}} \\
+X_{C} = -j\frac{RI}{2\pi fQ} 
+\end{gather}
+Z uzyskanego wzoru wynika, że reaktancja pojemnościowa jest wprost proporcjonalna do prądu płynącego przez układ oraz odwrotnie proporcjonalna do częstotliwości pobudzenia. Zależność możemy zaobserwować na poniższym wykresie:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    title={},
+    xlabel={Częstotliwość [kHz]},
+    ylabel={Natężenie [$\mu A$]},
+    xmin=0, xmax=20,
+    ymin=0, ymax=1273,
+    xtick={4,8,12,16,20},
+    ytick={0,200,400,600,800,1000,1200,1300},
+    legend pos=south east,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    (0,0)(1,98)(2,180)(4,361)(6,569)(8,686)(10,827)(12,933)(14,1047)(16,1124)(18,1209)(20,1273)
+    };
+\addlegendentry{$I_{C}$},
+
+    
+\end{axis}
+\end{tikzpicture}
+\caption{Zmiany wartości skutecznej natężenia prądu w obwodzie RC.}
+\end{figure}
+
+\subsection{Wartość skuteczna napięcia na pojemności}
+W celu wyznaczenia wartości skutecznej napięcia na pojemności skorzystaliśmy z napięciowego prawa Kirchoffa. \cite{mieczyslaw}
+\begin{gather}
+U_C = \sqrt{U_Z^2 - U_R^2}
+\end{gather}
+Wyniki przedstawiają się następująco:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1]
+\begin{axis}[
+title={},
+title style={text width=25em},
+xlabel={Częstotliwość [Hz]},
+ylabel={Wartość napięcia na pojemności [V]},
+xmin=1,xmax=20,
+ymin=0,ymax=2,
+xtick={1,2,4,6,8,10,12,14,16,18,20},
+ytick={0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8},
+legend pos=south east,
+ymajorgrids=true,grid style=dashed
+]
+
+\addplot[color=red,mark=square]
+coordinates {
+(0,0)
+(1,1.715)
+(2,1.765)
+(4,1.733)
+(6,1.673)
+(8,1.629)
+(10,1.513)
+(12,1.439)
+(14,1.362)
+(16,1.346)
+(18,1.175)
+(20,1.184)
+};
+
+\legend{u(f)}
+\end{axis}
+\end{tikzpicture}
+\caption{Wykres napięcia na pojemności w zależności od częstotliwości pobudzenia.}
+\end{figure}
+
+\newpage
+
+\section{Układ RL zasilony prądem przemiennym}
+
+Zbudowaliśmy następujący obwód RL na płytce prototypowej:  
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}
+	\draw (0,0)
+	to[sinusoidal voltage source, v=$5V_{pp}$, invert] (0,4)
+	to[american inductor, l=$L$, a=$33 mH$] (4,4)
+	to[R, a=$R$, l=$1k \Omega$] (4, 0) -- (0, 0);
+\end{circuitikz}
+\caption{Badany obwód RL.}
+\end{figure}
+
+\subsection{Pomiar napięć oraz przesunięcia fazowego}
+
+Z wykorzystaniem oscyloskopu uzyskaliśmy następujące pomiary:
+\begin{figure}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{\begin{tabular}[c]{@{}c@{}}Częstotliowść\\ pobudzenia\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na źródle\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na rezystancji\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Obliczone\\napięcie skuteczne\\ na cewce\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Przesunięcie fazowe\\ pomiędzy przebiegiem\\ wejściowym oraz\\ przebiegiem prądowym\end{tabular}} \\ \hline
+$1 kHz$                           & $1.753 V$                                                                       & $1.68 V$         & $0.501 V$                                                                    & $14.4 ^{\circ}$                                                                                                                    \\ \hline
+$2 kHz$                           & $1.781 V$                                                                       & $1.60 V$   & $0.782 V$                                                                           & $28.8 ^{\circ}$                                                                                                                    \\ \hline
+$4 kHz$                           & $1.799 V$                                                                       & $1.33 V$                           & $1.211 V$                                                   & $46.08 ^{\circ}$                                                                                                                   \\ \hline
+$6.4 kHz$                         & $1.842 V$                                                                       & $1.04 V$                                                         & $1.520 V$                     & $64.5 ^{\circ}$                                                                                                                    \\ \hline
+$8 kHz$                           & $1.856 V$                                                                       & $891 mV$                                                                 & $1.628 V$             & $51.84 ^{\circ}$                                                                                                                   \\ \hline
+$10 kHz$                          & $1.828 V$                                                                       & $742 mV$                                                                      & $1.671 V$        & $64.8 ^{\circ}$                                                                                                                    \\ \hline
+$12 kHz$                          & $1.825 V$                                                                       & $643 mV$                                                                     & $1.708 V$         & $60.48 ^{\circ}$                                                                                                                   \\ \hline
+$14 kHz$                          & $1.830 V$                                                                       & $576 mV$                                                                   & $1.737 V$           & $80.64 ^{\circ}$                                                                                                                   \\ \hline
+$16 kHz$                          & $1.884 V$                                                                       & $516 mV$                                                                 & $1.812 V$             & $73.73 ^{\circ}$                                                                                                                   \\ \hline
+$18 kHz$                          & $1.820 V$                                                                       & $470 mV$                                                                 & $1.758 V$             & $72.58 ^{\circ}$                                                                                                                   \\ \hline
+$20 kHz$                          & $1.884 V$                                                                       & $417 mV$                                                                  & $1.837 V$            & $74.88 ^{\circ}$                                                                                                                   \\ \hline
+\end{tabular}
+\caption{Pomiary napięć oraz przesunięcia fazowego w obwodzie RL.}
+\end{figure}
+
+\newpage
+\subsection{Obliczenie wartości teoretycznej napięć i prądu}
+
+Wykorzystaliśmy metodę liczb zespolonych do analitycznego wyznaczenia wartości napięć i prądów w obwodzie dla częstotliwości 20 kHz. 
+
+\begin{gather}
+U_{pp} = 5 V \\
+f = 20 kHz = 2 \cdot 10^4 Hz \\ 
+L = 33 mH = 3.3 \cdot 10^{-2} H \\
+R = 1k\Omega = 1 \cdot 10^3 \Omega
+\end{gather}
+
+W pierwszym kroku wyznaczyliśmy reaktancję cewki: 
+
+\begin{gather}
+|X_L| = \omega L = 2 \pi f L \\
+|X_L| = 2 \pi \cdot 2 \cdot 10^4 \cdot 3.3 \cdot 10^{-2} = 2 \pi \cdot 660 \\
+|X_L| = 4146.9 \Omega
+\end{gather}
+
+W następnym kroku wyznaczyliśmy impendancję układu:
+
+\begin{gather}
+|Z| = \sqrt{R^2 + X_L^2} \\
+|Z| = \sqrt{10^6 + 4146.9^2} = 4265.77 \Omega
+\end{gather}
+
+Następnie wyznaczyliśmy zespoloną wartość skuteczną napięcia: \cite{elektronika}
+
+\begin{gather}
+|U| = \frac{U_{p}}{\sqrt{2}} = \frac{U_{pp}}{2\sqrt{2}} \\
+|U| = \frac{5}{2\sqrt{2}} = 1.767 V
+\end{gather}
+
+W dalszym ciągu ustaliliśmy wartości skuteczne prądu płynącego przez układ oraz napięcia na rezystorze i cewce:
+
+\begin{gather}
+|I| = \frac{|U|}{|Z|} \\
+|I| = \frac{1.767}{4265.77} = 414.2 \mu A \\
+U_{rezystor} = |I| \cdot R = 414.2 mV
+\end{gather}
+
+Finalnie w celu wyznaczenia wartości skutecznej napięcia na cewce skorzystaliśmy z napięciowego prawa Kirchoffa. \cite{mieczyslaw}
+\begin{gather}
+U_{cewka} = \sqrt{U_{zrodlo}^2 - U_{rezystor}^2} \\
+U_{cewka} = \sqrt{1.767^2 - 0.4142^2} = 1.7177 V
+\end{gather}
+
+\newpage
+Wyniki ustalone analitycznie przedstawiają się następująco:
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Prąd układu} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na rezystancji\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne \\ na cewce\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Napięcie skuteczne\\ na źródle\end{tabular}} \\ \hline
+$414.2 \mu A$           & $414.2 mV$                                                                           & $1.7177 V$                                                                              & $1.767 V$                                                                       \\ \hline
+\end{tabular}
+\caption{Wyniki ustalone analitycznie dla obwodu RL.}
+\end{figure}
+
+Występuje drobna rozbieżność w granicach błędu pomiarowego - zmierzyliśmy napięcie skuteczne na rezystancji jako $414.2 mV$, natomiast drogą obliczeń ustaliliśmy jego wartość jako $417 mV$. Rozbieżność może być spowodowana niedoskonałością poszczególnych komponentów oraz napięciem skutecznym zasilania odbiegającym od wartości $5V$.
+
+\subsection{Relacja pomiędzy reaktancją indukcyjną a częstotliwością pobudzenia oraz wartością prądu w obwodzie}
+
+W celu ustalenia relacji przeprowadziliśmy modyfikację postaci wzoru na reaktancję indukcyjną:
+\begin{gather}
+X_{L} = j\omega L \\
+\omega = \frac{2\pi}{T} \\
+T = \frac{1}{f} \\
+L = \frac{\psi}{I} \\
+X_{L} = j2\pi f\frac{\psi}{I}
+\end{gather}
+Z uzyskanego wzoru wynika, że reaktancja indukcyjna jest odwrotnie proporcjonalna do prądu płynącego przez układ i wprost proporcjonalna do częstotliwości pobudzenia. Zależność możemy zaobserwować na poniższym wykresie:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    title={},
+    xlabel={Częstotliwość [kHz]},
+    ylabel={Natężenie [A]},
+    xmin=0, xmax=20,
+    ymin=0, ymax=1.68,
+    xtick={1,4,8,12,16,20},
+    ytick={0,0.25,0.5,0.75,1,1.25,1.5,1.75},
+    legend pos=south east,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    (1,1.68)(2,1.60)(4,1.33)(6,1.04)(8,0.891)(10,0.742)(12,0.643)(14,0.576)(16,0.516)(18,0.470)(20,0.417)
+    };
+\addlegendentry{$I_{L}$},
+
+    
+\end{axis}
+\end{tikzpicture}
+\caption{Zmiany wartości skutecznej natężenia prądu w obwodzie RL.}
+\end{figure}
+
+\subsection{Wartość skuteczna napięcia na cewce}
+W celu wyznaczenia wartości skutecznej napięcia na cewce skorzystaliśmy z napięciowego prawa Kirchoffa. \cite{mieczyslaw}
+\begin{gather}
+U_L = \sqrt{U_Z^2 - U_R^2}
+\end{gather}
+Wyniki przedstawiają się następująco:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1]
+\begin{axis}[
+title={},
+title style={text width=25em},
+xlabel={Częstotliwość [Hz]},
+ylabel={Wartość napięcia na cewce [V]},
+xmin=1,xmax=20,
+ymin=0,ymax=2,
+xtick={1,2,4,6,8,10,12,14,16,18,20},
+ytick={0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8},
+legend pos=south east,
+ymajorgrids=true,grid style=dashed
+]
+
+\addplot[color=red,mark=squares]
+coordinates {
+(1,0.500609)
+(2,0.782279)
+(4,1.211405)
+(6,1.520317)
+(8,1.628145)
+(10,1.670635)
+(12,1.707974)
+(14,1.736987)
+(16,1.81196)
+(18,1.758266)
+(20,1.837272)
+};
+
+\legend{u(f)}
+\end{axis}
+\end{tikzpicture}
+\caption{Wykres napięcia na cewce w zależności od częstotliwości pobudzenia.}
+\end{figure}
+
+\newpage
+\section{Wnioski}
+
+Zbudowaliśmy układy zawierające wyłącznie podstawowe elementy pasywne: rezystor, cewkę i kondensator, przy pomocy których zmierzyliśmy zależność ładowania pojemności w stosunku do czasu.
+Zrozumieliśmy pojęcie przesunięcia fazowego oraz sposób jego wyznaczania. Poznaliśmy także zależność pomiędzy częstotliwością pobudzenia układu a reaktancją indukcyjną oraz pojemnościową.
+
+\tableofcontents
+
+
+\bibliography{refs}
+
+\end{document}
+
